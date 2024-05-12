@@ -2,6 +2,7 @@
 
 Alle Aufgaben sind übernommen von Advent of Code. Es werden jedoch immer nur die ersten Teile der Aufgaben gelöst, da sonst der Aufwand zu groß wird.
 
+Aufgabe 1 und 3 sind Kandidaten für die Studie, beide beinhalten eine Art von Grid mit einer Logik. Aufgabe 2 ist als Backup gedacht, falls die anderen beiden Aufgaben unpassend sind.
 
 ## Aufgabe 1:
 
