@@ -207,3 +207,4 @@ for (let i = 0; i < visited.length; i++) {
 console.log(beamTraces)
 console.log(visited.map(row => row.map(cell => cell.fromtop || cell.frombottom || cell.fromright || cell.fromleft ? "#" : ".").join("")).join("\n"));
 console.log(visited.reduce((acc, val) => acc + val.reduce((acc, val) => acc + (val.fromtop || val.frombottom || val.fromright || val.fromleft ? 1 : 0), 0), 0));
+
