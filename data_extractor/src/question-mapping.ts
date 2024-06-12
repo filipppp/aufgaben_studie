@@ -25,8 +25,8 @@ export type TaskQuestions = {
     securitySafe: Agreement,
     promptingTechAverage: "Yes" | "No" | "Never use ChatGPT for development",
     supervisorTaskComplete: "Yes" | "No",
-    supervisorInitial: string,
-    supervisorRefine: string,
+    supervisorInitial: number,
+    supervisorRefine: number,
 }
 
 export type StudyQuestions = {
@@ -63,7 +63,7 @@ export const keyToQuestion = {
         leetCodeChallengeFrequency: "How often are you completing LEET-Code style challenges?",
     },
     taskSpecific: {
-        perceivedProductivity: "Preceived productivity: While doing this task I felt like I was productive.",
+        perceivedProductivity: "Perceived productivity: While doing this task I felt like I was productive.",
         efficiency: "Efficiency: While doing this task I felt like I was efficient.",
         autonomyCause: "Autonomy: While doing this task I felt like I was the cause of my own actions rather than feeling that external forces or pressure are the cause of my actions.",
         autonomyFreedom: "Autonomy: While doing this task I felt like I was free to do things my own way.",
@@ -74,8 +74,8 @@ export const keyToQuestion = {
         stimulationNew: "Stimulation: While doing this task I felt like I was experiencing new sensations and activities.",
         stimulationPleasure: "Stimulation: While doing this task I felt like I was experiencing intense physical pleasure and enjoyment.",
         stimulationType: "Stimulation: While doing this task I felt like I found a new source and type of stimulation for myself.",
-        meaningDevelopment: "Meaning: While doing this task I felt like developing my coding skills to my best potential and making the coding process fullfilling and purposeful.",
-        meaningBecoming: "Meaning: While doing this task I felt like I was „becoming who I really am“",
+        meaningDevelopment: "Meaning: While doing this task I felt like developing my coding skills to my best potential and making the coding process fulfilling and purposeful.",
+        meaningBecoming: 'Meaning: While doing this task I felt like I was "becoming who I really am".',
         meaningUnderstanding: "Meaning: While doing this task I felt like I had a deeper understanding of myself and my place in the universe.",
         securityRoutine: "Security: While doing this task I felt like I had a comfortable set of routines and habits.",
         securityStructured: "Security: While doing this task I felt that my life was structured and predictable.",
@@ -87,7 +87,7 @@ export const keyToQuestion = {
     },
     post: {
         futureUseOfLLMs: "Do you think you will use LLMs more in your development process in the future because of this study?",
-        additionalInputs: "Do you have any more inputs for this study? Do you want to want to add notes?",
+        additionalInputs: "Do you have any more inputs for this study? Do you want to add notes?",
         attitudeChangeOnAI: "Has your attitude on the use of AI and LLMs changed as a result of this study? If yes, how?  ",
     }
 }
