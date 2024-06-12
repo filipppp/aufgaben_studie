@@ -70,12 +70,12 @@ def plot_timings(stats, plt):
     # Creating the bar chart
     plt.figure(figsize=(10, 6))
     width = 0.35
-    plt.bar(x - width / 2, task1, width, label="Challenge 1")
-    plt.bar(x + width / 2, task2, width, label="Challenge 2")
+    plt.bar(x - width / 2, task1, width, label="Challenge 1", color="C2")
+    plt.bar(x + width / 2, task2, width, label="Challenge 2", color="C3")
     # Adding titles and labels
     plt.title("Average time taken per challenge")
     plt.ylabel('Count')
-    plt.xticks(ticks=x, labels=labels, color=["C3", "C4"])
+    plt.xticks(ticks=x, labels=labels)
     plt.legend()
     plt.savefig('out/timings/{}'.format("Average time taken per challenge"))
     # Display the plot
