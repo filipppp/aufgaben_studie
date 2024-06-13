@@ -17,7 +17,7 @@ def boxplot(plt, datapoints, labels, title, ylabel, colors=None):
     medians = [np.median(data) for data in datapoints]
     positions = np.arange(1, len(datapoints)+1)  # positions corresponding to box locations
     for pos, med in zip(positions, medians):
-        text = plt.text(pos, med, f'{med}', ha='center', va='center', fontweight="bold", color='white', fontsize=14)
+        text = plt.text(pos, med, f'{round(med)}', ha='center', va='center', fontweight="bold", color='white', fontsize=14)
         text.set_path_effects([path_effects.withStroke(linewidth=1, foreground='black')])
     plt.xticks(positions, labels)
     plt.title(title)

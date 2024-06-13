@@ -42,7 +42,7 @@ export function readCsv(): Promise<void> {
                 let studyQuestions: { [P in keyof StudyQuestions]: {[U in keyof StudyQuestions[P]]?: StudyQuestions[P][U]} } = {pre: {}, post: {}, task1: {}, task2: {}};
                 for (const [key, question] of Object.entries(keyToQuestion.pre)) {
                     // @ts-ignore
-                    studyQuestions.pre[key] = isNaN(parseInt(row[question])) ? row[question] : parseInt(row[question]);
+                    studyQuestions.pre[key] = isNaN(parseFloat(row[question])) ? row[question] : parseFloat(row[question]);
                 }
                 for (const [key, question] of Object.entries(keyToQuestion.post)) {
                     // @ts-ignore
@@ -54,7 +54,6 @@ export function readCsv(): Promise<void> {
                     // @ts-ignore
                     studyQuestions.task2[key] = isNaN(parseInt(row["1"+question])) ? row["1"+question] : timeToMinutes(row["1"+question]);
                 }
-                console.log(studyQuestions)
                 return {
                     studyQuestions: studyQuestions as StudyQuestions,
                     task1: readParticipantFiles(row["E-Mail-Adresse"], 1),
@@ -74,7 +73,7 @@ function timeToMinutes(time: string) {
 
     // Calculate total minutes
     const totalMinutes = hours * 60 + minutes + seconds / 60;
-    return Math.floor(totalMinutes);  // Return the floor value of the total minutes
+    return totalMinutes;  // Return the floor value of the total minutes
 }
 
 

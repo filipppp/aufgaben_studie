@@ -4,9 +4,9 @@ from data_extractor.vis_timings import plot_timings
 import json
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
 mpl.rc('font', **{'sans-serif' : 'Arial',
                          'family' : 'sans-serif'})
-
 mpl.rcParams['font.family'] = 'Arial'
 mpl.rcParams['font.size'] = 12
 mpl.rcParams['axes.titlesize'] = 14  # Title a little bigger
@@ -21,5 +21,7 @@ stats = json.load(f)
 
 #
 plot_questions(stats, plt)
-# plot_timings(stats, plt)
-# plot_files(stats, plt)
+plot_timings(stats, plt)
+plot_files(stats, plt)
+
+
