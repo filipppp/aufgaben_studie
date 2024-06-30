@@ -12,6 +12,7 @@ export type ParticipantFiles = {
 }
 
 export type ParticipantInfo = {
+    email: string;
     studyQuestions: StudyQuestions
     task1: ParticipantFiles,
     task2: ParticipantFiles
@@ -55,6 +56,7 @@ export function readCsv(): Promise<void> {
                     studyQuestions.task2[key] = isNaN(parseInt(row["1"+question])) ? row["1"+question] : timeToMinutes(row["1"+question]);
                 }
                 return {
+                    email: row["E-Mail-Adresse"],
                     studyQuestions: studyQuestions as StudyQuestions,
                     task1: readParticipantFiles(row["E-Mail-Adresse"], 1),
                     task2: readParticipantFiles(row["E-Mail-Adresse"], 2)
@@ -73,7 +75,7 @@ function timeToMinutes(time: string) {
 
     // Calculate total minutes
     const totalMinutes = hours * 60 + minutes + seconds / 60;
-    return totalMinutes;  // Return the floor value of the total minutes
+    return Math.round(totalMinutes*10)/10;  // Return the floor value of the total minutes
 }
 
 

@@ -198,3 +198,82 @@ function getDiff(gpt: string, user: string) {
     }).join('\n');
     return {deleted, added, changed: deleted+added}
 }
+
+
+export function getCsv() {
+    return participants.map(p => {
+        const row: any = {}
+        row["email"] = p.email;
+        row["Study Variation"] = p.studyQuestions.pre.variant;
+        row["Gender"] = p.studyQuestions.pre.gender;
+        row["Age"] = p.studyQuestions.pre.age;
+        row["Years of working experience in IT"] = p.studyQuestions.pre.csWorkYears;
+        row["Years of experience in IT"] = p.studyQuestions.pre.csFieldYears;
+        row["Programming language"] = p.studyQuestions.pre.programmingLanguage;
+        row["LEET Code Frequency"] = p.studyQuestions.pre.leetCodeChallengeFrequency;
+        row["Attitude towards AI"] = p.studyQuestions.pre.attitudeTowardsAI;
+        row["LLM usage frequency"] = p.studyQuestions.pre.llmUsageFrequency;
+        row["Future use of LLMs"] = p.studyQuestions.post.futureUseOfLLMs;
+
+        let labelOne = "";
+        let labelTwo = "";
+        if (p.studyQuestions.pre.variant === "Variation 1") {
+            labelOne = "simple";
+            labelTwo = "complex";
+        } else {
+            labelOne = "complex";
+            labelTwo = "simple";
+        }
+        row[`${labelOne}/efficiency`] = getAgreementScore(p.studyQuestions.task1.efficiency);
+        row[`${labelOne}/autonomy`] = getScoreFor(p, "autonomy", "task1");
+        row[`${labelOne}/stimulation`] = getScoreFor(p, "stimulation", "task1");
+        row[`${labelOne}/competence`] = getScoreFor(p, "competence", "task1");
+        row[`${labelOne}/meaning`] = getScoreFor(p, "meaning", "task1");
+        row[`${labelOne}/security`] = getScoreFor(p, "security", "task1");
+        row[`${labelOne}/taskComplete`] = p.studyQuestions.task1.supervisorTaskComplete;
+        row[`${labelOne}/initialSolution (minutes)`] = p.studyQuestions.task1.supervisorInitial;
+        row[`${labelOne}/refine (minutes)`] = p.studyQuestions.task1.supervisorRefine;
+        row[`${labelOne}/complete (minutes)`] = p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial;
+        row[`${labelTwo}/efficiency`] = getAgreementScore(p.studyQuestions.task2.efficiency);
+        row[`${labelTwo}/autonomy`] = getScoreFor(p, "autonomy", "task2");
+        row[`${labelTwo}/stimulation`] = getScoreFor(p, "stimulation", "task2");
+        row[`${labelTwo}/competence`] = getScoreFor(p, "competence", "task2");
+        row[`${labelTwo}/meaning`] = getScoreFor(p, "meaning", "task2");
+        row[`${labelTwo}/security`] = getScoreFor(p, "security", "task2");
+        row[`${labelTwo}/taskComplete`] = p.studyQuestions.task2.supervisorTaskComplete;
+        row[`${labelTwo}/initialSolution (minutes)`] = p.studyQuestions.task2.supervisorInitial;
+        row[`${labelTwo}/refine (minutes)`] = p.studyQuestions.task2.supervisorRefine;
+        row[`${labelTwo}/complete (minutes)`] = p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial;
+
+        row[`task1/taskComplete`] = p.studyQuestions.task1.supervisorTaskComplete;
+        row[`task1/initialSolution (minutes)`] = p.studyQuestions.task1.supervisorInitial;
+        row[`task1/refine (minutes)`] = p.studyQuestions.task1.supervisorRefine;
+        row[`task2/taskComplete`] = p.studyQuestions.task2.supervisorTaskComplete;
+        row[`task2/initialSolution (minutes)`] = p.studyQuestions.task2.supervisorInitial;
+        row[`task2/refine (minutes)`] = p.studyQuestions.task2.supervisorRefine;
+
+        return row;
+    })
+}
+
+function getScoreFor(p: ParticipantInfo, need: "autonomy" | "security" | "meaning" | "competence" | "stimulation", task: "task1" | "task2") {
+    let score = 0;
+    Object.keys(p.studyQuestions[task]).filter(k => k.startsWith(need))
+        .forEach((k: keyof TaskQuestions) => score += getAgreementScore(p.studyQuestions[task][k] as string));
+    return Math.round((score / 3)*10)/10
+}
+
+function getAgreementScore(val: string) {
+    switch (val) {
+        case "Strongly disagree":
+            return -2;
+        case "Disagree":
+            return -1;
+        case "Neutral":
+            return 0;
+        case "Agree":
+            return 1;
+        case "Strongly agree":
+            return 2;
+    }
+}
