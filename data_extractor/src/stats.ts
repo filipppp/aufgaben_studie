@@ -215,43 +215,56 @@ export function getCsv() {
         row["LLM usage frequency"] = p.studyQuestions.pre.llmUsageFrequency;
         row["Future use of LLMs"] = p.studyQuestions.post.futureUseOfLLMs;
 
-        let labelOne = "";
-        let labelTwo = "";
-        if (p.studyQuestions.pre.variant === "Variation 1") {
-            labelOne = "simple";
-            labelTwo = "complex";
-        } else {
-            labelOne = "complex";
-            labelTwo = "simple";
+        let taskSimple: 'task1' | 'task2' = "task1";
+        let taskComplex: 'task1' | 'task2' = "task2";
+        if (p.studyQuestions.pre.variant !== "Variation 1") {
+            taskSimple = "task2";
+            taskComplex = "task1";
         }
-        row[`${labelOne}/efficiency`] = getAgreementScore(p.studyQuestions.task1.efficiency);
-        row[`${labelOne}/autonomy`] = getScoreFor(p, "autonomy", "task1");
-        row[`${labelOne}/stimulation`] = getScoreFor(p, "stimulation", "task1");
-        row[`${labelOne}/competence`] = getScoreFor(p, "competence", "task1");
-        row[`${labelOne}/meaning`] = getScoreFor(p, "meaning", "task1");
-        row[`${labelOne}/security`] = getScoreFor(p, "security", "task1");
-        row[`${labelOne}/taskComplete`] = p.studyQuestions.task1.supervisorTaskComplete;
-        row[`${labelOne}/initialSolution (minutes)`] = p.studyQuestions.task1.supervisorInitial;
-        row[`${labelOne}/refine (minutes)`] = p.studyQuestions.task1.supervisorRefine;
-        row[`${labelOne}/complete (minutes)`] = p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial;
-        row[`${labelTwo}/efficiency`] = getAgreementScore(p.studyQuestions.task2.efficiency);
-        row[`${labelTwo}/autonomy`] = getScoreFor(p, "autonomy", "task2");
-        row[`${labelTwo}/stimulation`] = getScoreFor(p, "stimulation", "task2");
-        row[`${labelTwo}/competence`] = getScoreFor(p, "competence", "task2");
-        row[`${labelTwo}/meaning`] = getScoreFor(p, "meaning", "task2");
-        row[`${labelTwo}/security`] = getScoreFor(p, "security", "task2");
-        row[`${labelTwo}/taskComplete`] = p.studyQuestions.task2.supervisorTaskComplete;
-        row[`${labelTwo}/initialSolution (minutes)`] = p.studyQuestions.task2.supervisorInitial;
-        row[`${labelTwo}/refine (minutes)`] = p.studyQuestions.task2.supervisorRefine;
-        row[`${labelTwo}/complete (minutes)`] = p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial;
+        row[`simple/efficiency`] = getAgreementScore(p.studyQuestions[taskSimple].efficiency);
+        row[`simple/productivity`] = getAgreementScore(p.studyQuestions[taskSimple].perceivedProductivity);
+        row[`simple/promptingDaily`] = p.studyQuestions[taskSimple].promptingTechAverage;
+        row[`simple/autonomy`] = getScoreFor(p, "autonomy", taskSimple);
+        row[`simple/stimulation`] = getScoreFor(p, "stimulation", taskSimple);
+        row[`simple/competence`] = getScoreFor(p, "competence", taskSimple);
+        row[`simple/meaning`] = getScoreFor(p, "meaning", taskSimple);
+        row[`simple/security`] = getScoreFor(p, "security", taskSimple);
+        row[`simple/taskComplete`] = p.studyQuestions[taskSimple].supervisorTaskComplete;
+        row[`simple/initialSolution (seconds)`] = p.studyQuestions[taskSimple].supervisorInitial;
+        row[`simple/refine (seconds)`] = p.studyQuestions[taskSimple].supervisorRefine;
+        row[`simple/complete (seconds)`] = p.studyQuestions[taskSimple].supervisorRefine + p.studyQuestions[taskSimple].supervisorInitial;
+        row[`simple/initialSolutionFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorInitial : null;
+        row[`simple/refineFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorRefine : null;
+        row[`simple/completeFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorRefine + p.studyQuestions[taskSimple].supervisorInitial : null;
+        row[`complex/efficiency`] = getAgreementScore(p.studyQuestions[taskComplex].efficiency);
+        row[`complex/productivity`] = getAgreementScore(p.studyQuestions[taskComplex].perceivedProductivity);
+        row[`complex/promptingDaily`] = p.studyQuestions[taskComplex].promptingTechAverage;
+        row[`complex/autonomy`] = getScoreFor(p, "autonomy", taskComplex);
+        row[`complex/stimulation`] = getScoreFor(p, "stimulation", taskComplex);
+        row[`complex/competence`] = getScoreFor(p, "competence", taskComplex);
+        row[`complex/meaning`] = getScoreFor(p, "meaning", taskComplex);
+        row[`complex/security`] = getScoreFor(p, "security", taskComplex);
+        row[`complex/taskComplete`] = p.studyQuestions[taskComplex].supervisorTaskComplete;
+        row[`complex/initialSolutionFinished (seconds)`] = p.studyQuestions[taskComplex].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskComplex].supervisorInitial : null;
+        row[`complex/refineFinished (seconds)`] = p.studyQuestions[taskComplex].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskComplex].supervisorRefine : null;
+        row[`complex/completeFinished (seconds)`] = p.studyQuestions[taskComplex].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskComplex].supervisorRefine + p.studyQuestions[taskComplex].supervisorInitial : null;
+        row[`complex/initialSolution (seconds)`] = p.studyQuestions[taskComplex].supervisorInitial;
+        row[`complex/refine(seconds)`] = p.studyQuestions[taskComplex].supervisorRefine;
+        row[`complex/complete(seconds)`] = p.studyQuestions[taskComplex].supervisorRefine + p.studyQuestions[taskComplex].supervisorInitial;
+
 
         row[`task1/taskComplete`] = p.studyQuestions.task1.supervisorTaskComplete;
-        row[`task1/initialSolution (minutes)`] = p.studyQuestions.task1.supervisorInitial;
-        row[`task1/refine (minutes)`] = p.studyQuestions.task1.supervisorRefine;
+        row[`task1/initialSolution (seconds)`] = p.studyQuestions.task1.supervisorInitial;
+        row[`task1/refine (seconds)`] = p.studyQuestions.task1.supervisorRefine;
+        row[`task1/initialSolutionFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorInitial : null;
+        row[`task1/refineFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorRefine : null;
+        row[`task1/completeFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial : null;
         row[`task2/taskComplete`] = p.studyQuestions.task2.supervisorTaskComplete;
-        row[`task2/initialSolution (minutes)`] = p.studyQuestions.task2.supervisorInitial;
-        row[`task2/refine (minutes)`] = p.studyQuestions.task2.supervisorRefine;
-
+        row[`task2/initialSolution (seconds)`] = p.studyQuestions.task2.supervisorInitial;
+        row[`task2/refine (seconds)`] = p.studyQuestions.task2.supervisorRefine;
+        row[`task2/initialSolutionFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorInitial : null;
+        row[`task2/refineFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorRefine : null;
+        row[`task2/completeFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorRefine + p.studyQuestions.task2.supervisorInitial : null;
         return row;
     })
 }
@@ -260,20 +273,20 @@ function getScoreFor(p: ParticipantInfo, need: "autonomy" | "security" | "meanin
     let score = 0;
     Object.keys(p.studyQuestions[task]).filter(k => k.startsWith(need))
         .forEach((k: keyof TaskQuestions) => score += getAgreementScore(p.studyQuestions[task][k] as string));
-    return Math.round((score / 3)*10)/10
+    return Math.round((score / 3)*1000)/1000
 }
 
 function getAgreementScore(val: string) {
     switch (val) {
         case "Strongly disagree":
-            return -2;
-        case "Disagree":
-            return -1;
-        case "Neutral":
-            return 0;
-        case "Agree":
             return 1;
-        case "Strongly agree":
+        case "Disagree":
             return 2;
+        case "Neutral":
+            return 3;
+        case "Agree":
+            return 4;
+        case "Strongly agree":
+            return 5;
     }
 }

@@ -51,9 +51,9 @@ export function readCsv(): Promise<void> {
                 }
                 for (const [key, question] of Object.entries(keyToQuestion.taskSpecific)) {
                     // @ts-ignore
-                    studyQuestions.task1[key] = isNaN(parseInt(row[question])) ? row[question] : timeToMinutes(row[question]);
+                    studyQuestions.task1[key] = isNaN(parseInt(row[question])) ? row[question] : timeToSeconds(row[question]);
                     // @ts-ignore
-                    studyQuestions.task2[key] = isNaN(parseInt(row["1"+question])) ? row["1"+question] : timeToMinutes(row["1"+question]);
+                    studyQuestions.task2[key] = isNaN(parseInt(row["1"+question])) ? row["1"+question] : timeToSeconds(row["1"+question]);
                 }
                 return {
                     email: row["E-Mail-Adresse"],
@@ -67,14 +67,14 @@ export function readCsv(): Promise<void> {
     });
 }
 
-function timeToMinutes(time: string) {
+function timeToSeconds(time: string) {
     const parts = time.split(':');  // Split the time string into parts
     const hours = parseInt(parts[0]);  // Get the hours and convert to integer
     const minutes = parseInt(parts[1]);  // Get the minutes and convert to integer
     const seconds = parseInt(parts[2]);  // Get the seconds and convert to integer
 
     // Calculate total minutes
-    const totalMinutes = hours * 60 + minutes + seconds / 60;
+    const totalMinutes = hours * 60 * 60 + minutes * 60 + seconds;
     return Math.round(totalMinutes*10)/10;  // Return the floor value of the total minutes
 }
 

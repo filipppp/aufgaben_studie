@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import plot_likert
+from matplotlib.ticker import FixedLocator, FixedFormatter
+
 
 def plot_questions(stats, plt):
     plot_prompt_type(stats, plt)
@@ -38,8 +40,8 @@ def plot_prompt_type(stats, plt):
         data_complex = stats["distribution"]["complex"][key]
         data_simple = stats["distribution"]["simple"][key]
         if "Agree" in data_complex.keys() or "Agree" in data_simple.keys():
-            dict_simple[stats["mapping"]["taskSpecific"][key]] = [key for key, count in data_complex.items() for _ in range(count)]
-            dict_complex[stats["mapping"]["taskSpecific"][key]] = [key for key, count in data_simple.items() for _ in range(count)]
+            dict_simple[stats["mapping"]["taskSpecific"][key]] = [key for key, count in data_simple.items() for _ in range(count)]
+            dict_complex[stats["mapping"]["taskSpecific"][key]] = [key for key, count in data_complex.items() for _ in range(count)]
         else:
             labels = list(data_complex.keys())  # Extract labels (Agree, Disagree, Neutral)
             x = np.arange(len(labels))  # the label locations
@@ -60,26 +62,27 @@ def plot_prompt_type(stats, plt):
             plt.yticks(np.arange(12))
             plt.savefig('out/questions/{}'.format("perPrompt"+key))
             plt.show()
-    dict_complex[""] = np.full(8, np.NaN)
-    dict_simple[""] = np.full(8, np.NaN)
+    dict_complex[""] = np.full(12, np.NaN)
+    dict_simple[""] = np.full(12, np.NaN)
     dict_simple = pd.DataFrame(dict_simple)
     dict_complex = pd.DataFrame(dict_complex)
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 20))
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 20), sharex=True)
     fig.subplots_adjust(left=0.3, right=0.8)
     plot_likert.plot_likert(dict_simple, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax1,
-                            label_max_width=70, xtick_interval=1,
-                            width=0.2,
-                            legend=0, colors=plot_likert.colors.likert5)
-    plot_likert.plot_likert(dict_complex, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax2,
-                            label_max_width=70, width=0.2, xtick_interval=1,
+                            label_max_width=70, width=0.2, xtick_interval=1, bar_labels=True, bar_labels_color="snow", doCenterLine=True,
                             legend=0)
-    tick_positions = np.concatenate((np.arange(8, -1, -1), np.arange(1,9)))
+    plot_likert.plot_likert(dict_complex, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax2,
+                            label_max_width=70, width=0.2, xtick_interval=1, bar_labels=True, bar_labels_color="snow",
+                            legend=0)
+    tick_positions = np.concatenate((np.arange(12, -1, -1), np.arange(1,13)))
     ax2.set_xticks(np.arange(len(tick_positions)))
     ax2.set_xticklabels(tick_positions)
     ax1.set_xticks(np.arange(len(tick_positions)))
     ax1.set_xticklabels(tick_positions)
     ax2.yaxis.set_visible(False)
+
     ax2.xaxis.set_visible(False)
+    ax1.xaxis.set_visible(False)
     ax2.set_xlabel('')
 
     # Get the current position of the axes [left, bottom, width, height]
@@ -87,18 +90,15 @@ def plot_prompt_type(stats, plt):
     posax2 = ax2.get_position()
     # Calculate the shift in normalized figure coordinates
     dpi = fig.dpi
-    ax2.set_position([posax2.x0 - 27.25 / dpi, posax2.y0, posax2.width, posax2.height])
+    ax2.set_position([posax2.x0 - 27.75 / dpi, posax2.y0, posax2.width, posax2.height])
     ax1.set_position([posax1.x0, posax1.y0 + 0.9 / dpi, posax1.width, posax2.height])
     ax2.set_facecolor('none')
     for spine in ax2.spines.values():
         spine.set_visible(False)
 
     handles, labels = ax1.get_legend_handles_labels()
-    legend1 = fig.legend(handles, labels, bbox_to_anchor=(0.64, .893), title="Simple prompting")
-    handles, labels = ax2.get_legend_handles_labels()
-    legend2 = fig.legend(handles, labels, bbox_to_anchor=(0.64, .815), title="Complex prompting")
+    legend1 = fig.legend(handles, labels, borderpad=1, handlelength=2, handletextpad=2, labelspacing=1, bbox_to_anchor=(0.67, .893), title="Top: Simple Prompting\nBottom: Complex Prompting")
     plt.setp(legend1.get_title(), fontweight='bold')
-    plt.setp(legend2.get_title(), fontweight='bold')
     fig.gca().add_artist(legend1)
     plt.savefig('out/questions/{}'.format("per_prompt_type"))
     plt.show()
@@ -135,26 +135,26 @@ def plot_task(stats, plt):
             plt.yticks(np.arange(12))
             plt.savefig('out/questions/{}'.format("perTask"+key))
             plt.show()
-    dict_task2[""] = np.full(8, np.NaN)
-    dict_task1[""] = np.full(8, np.NaN)
+    dict_task2[""] = np.full(12, np.NaN)
+    dict_task1[""] = np.full(12, np.NaN)
     dict_task1 = pd.DataFrame(dict_task1)
     dict_task2 = pd.DataFrame(dict_task2)
-    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 20))
+    fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20, 20), sharex=True)
     fig.subplots_adjust(left=0.3, right=0.8)
     plot_likert.plot_likert(dict_task1, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax1,
-                            label_max_width=70, xtick_interval=1,
-                            width=0.2,
-                            legend=0, colors=plot_likert.colors.likert5)
-    plot_likert.plot_likert(dict_task2, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax2,
-                            label_max_width=70, width=0.2, xtick_interval=1,
+                            label_max_width=70, width=0.2, xtick_interval=1, bar_labels=True, bar_labels_color="snow", doCenterLine=True,
                             legend=0)
-    tick_positions = np.concatenate((np.arange(8, -1, -1), np.arange(1,9)))
+    plot_likert.plot_likert(dict_task2, ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],ax = ax2,
+                            label_max_width=70, width=0.2, xtick_interval=1, bar_labels=True, bar_labels_color="snow",
+                            legend=0)
+    tick_positions = np.concatenate((np.arange(12, -1, -1), np.arange(1,13)))
     ax2.set_xticks(np.arange(len(tick_positions)))
     ax2.set_xticklabels(tick_positions)
     ax1.set_xticks(np.arange(len(tick_positions)))
     ax1.set_xticklabels(tick_positions)
     ax2.yaxis.set_visible(False)
     ax2.xaxis.set_visible(False)
+    ax1.xaxis.set_visible(False)
     ax2.set_xlabel('')
 
     # Get the current position of the axes [left, bottom, width, height]
@@ -162,18 +162,15 @@ def plot_task(stats, plt):
     posax2 = ax2.get_position()
     # Calculate the shift in normalized figure coordinates
     dpi = fig.dpi
-    ax2.set_position([posax2.x0 - 27.25 / dpi, posax2.y0, posax2.width, posax2.height])
+    ax2.set_position([posax2.x0 - 27.75 / dpi, posax2.y0, posax2.width, posax2.height])
     ax1.set_position([posax1.x0, posax1.y0 + 0.9 / dpi, posax1.width, posax2.height])
     ax2.set_facecolor('none')
     for spine in ax2.spines.values():
         spine.set_visible(False)
 
     handles, labels = ax1.get_legend_handles_labels()
-    legend1 = fig.legend(handles, labels, bbox_to_anchor=(0.64, .893), title="Task 1")
-    handles, labels = ax2.get_legend_handles_labels()
-    legend2 = fig.legend(handles, labels, bbox_to_anchor=(0.64, .815), title="Task 2")
+    legend1 = fig.legend(handles, labels, borderpad=1, handlelength=2, handletextpad=2, labelspacing=1, bbox_to_anchor=(0.67, .893), title="Top: Challenge One\nBottom: Challenge Two")
     plt.setp(legend1.get_title(), fontweight='bold')
-    plt.setp(legend2.get_title(), fontweight='bold')
     fig.gca().add_artist(legend1)
     plt.savefig('out/questions/{}'.format("per_task"))
     plt.show()

@@ -19,9 +19,7 @@ async function setup() {
     const csvExport = getCsv();
     const csvHeader = Object.keys(csvExport[0]).join(",") + "\n";
     const csv = csvHeader + csvExport.map(row => Object.values(row).join(",")).join("\n");
-    console.log(csv)
     fs.writeFileSync("export.csv", csv);
-    return;
 
     const distribution: any = {
         task1: {},
