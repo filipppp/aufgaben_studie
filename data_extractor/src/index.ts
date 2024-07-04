@@ -22,6 +22,7 @@ async function setup() {
     fs.writeFileSync("export.csv", csv);
 
     const distribution: any = {
+        csv: csvExport,
         task1: {},
         task2: {},
         simple: {},

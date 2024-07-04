@@ -53,7 +53,7 @@ def plot_files(stats, plt):
                       codeStats["task2"][type]
                       ],
                 ["Simple prompts", "Complex prompts", "Challenge 1", "Challenge 2"], "Code lines " + type,
-                "Changes"
+                "Lines changed"
                 )
 
 

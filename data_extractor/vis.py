@@ -1,6 +1,7 @@
 from data_extractor.vis_files import plot_files
 from data_extractor.vis_questions import plot_questions
 from data_extractor.vis_timings import plot_timings
+from data_extractor.vis_needs import plot_needs
 import json
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -20,8 +21,9 @@ f = open('stats.json')
 stats = json.load(f)
 
 #
-plot_questions(stats, plt)
-plot_timings(stats, plt)
-plot_files(stats, plt)
+# plot_questions(stats, plt)
+# plot_timings(stats, plt)
+# plot_files(stats, plt)
+plot_needs(stats, plt)
 
 
