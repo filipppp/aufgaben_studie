@@ -11,6 +11,7 @@ def plot_questions(stats, plt):
 
 def plot_pre_and_post(stats, plt):
     keys = ["variant", "gender", "attitudeTowardsAI", "leetCodeChallengeFrequency", "programmingLanguage", "futureUseOfLLMs"]
+    colors = {"attitudeTowardsAI": ["#63ab20", "#7da854", "#bababa", "#e87c74", "#e8392c"], "futureUseOfLLMs": ["#7da854", "#e8392c", "#e87c74", "#bababa", "black"]}
     sizes = [(4,5), (6,4), (10,6), (6,4), (6,4), (8,5)]
     for i, key in enumerate(keys):
         data = stats["distribution"]["pre" if key != "futureUseOfLLMs" else "post"][key]
@@ -30,6 +31,13 @@ def plot_pre_and_post(stats, plt):
         plt.yticks(np.arange(12))
         plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/{}'.format(key))
         plt.show()
+        plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%', colors=colors[key] if key in colors else None, wedgeprops = {"edgecolor" : "black",
+                      'linewidth': .5,
+                      'antialiased': True})
+        plt.title(stats["mapping"]["pre" if key != "futureUseOfLLMs" else "post"][key], wrap=True)
+        plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/pie_{}'.format(key))
+        plt.show()
+        print(data)
 
 
 def plot_prompt_type(stats, plt):
