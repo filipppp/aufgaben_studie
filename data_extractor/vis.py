@@ -21,9 +21,9 @@ f = open('stats.json')
 stats = json.load(f)
 
 #
+plot_timings(stats, plt)
 plot_questions(stats, plt)
-# plot_timings(stats, plt)
-# plot_files(stats, plt)
-# plot_needs(stats, plt)
+plot_files(stats, plt)
+plot_needs(stats, plt)
 
 

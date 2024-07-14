@@ -11,10 +11,14 @@ def plot_questions(stats, plt):
 
 def plot_pre_and_post(stats, plt):
     keys = ["variant", "gender", "attitudeTowardsAI", "leetCodeChallengeFrequency", "programmingLanguage", "futureUseOfLLMs"]
-    colors = {"attitudeTowardsAI": ["#63ab20", "#7da854", "#bababa", "#e87c74", "#e8392c"], "futureUseOfLLMs": ["#7da854", "#e8392c", "#e87c74", "#bababa", "black"]}
+    colors = {"attitudeTowardsAI": ["#63ab20", "#7da854", "#bababa", "#e87c74", "#e8392c"],
+              "futureUseOfLLMs": ["#7da854", "#e8392c", "#e87c74", "#bababa", "black"],
+              "leetCodeChallengeFrequency": ["#e8392c", "#e87c74", "#bababa"],
+              }
     sizes = [(4,5), (6,4), (10,6), (6,4), (6,4), (8,5)]
     for i, key in enumerate(keys):
-        data = stats["distribution"]["pre" if key != "futureUseOfLLMs" else "post"][key]
+        data_tmp = stats["distribution"]["pre" if key != "futureUseOfLLMs" else "post"][key]
+        data = {key: value for key, value in data_tmp.items() if value != 0}
         labels = list(data.keys())  # Extract labels (Agree, Disagree, Neutral)
         x = np.arange(len(labels))  # the label locations
         width = 0.35  # the width of the bars
@@ -29,15 +33,15 @@ def plot_pre_and_post(stats, plt):
         # Display the plot
         plt.ylim(top=11)
         plt.yticks(np.arange(12))
-        plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/{}'.format(key))
+        plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/{}'.format(key), dpi=300)
         plt.show()
+        plt.figure(figsize=(6,5))
         plt.pie(data.values(), labels=data.keys(), autopct='%1.1f%%', colors=colors[key] if key in colors else None, wedgeprops = {"edgecolor" : "black",
                       'linewidth': .5,
                       'antialiased': True})
         plt.title(stats["mapping"]["pre" if key != "futureUseOfLLMs" else "post"][key], wrap=True)
-        plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/pie_{}'.format(key))
+        plt.savefig('out/questions/'+ ("pre" if key != "futureUseOfLLMs" else "post") +'/pie_{}'.format(key), dpi=300)
         plt.show()
-        print(data)
 
 
 def plot_prompt_type(stats, plt):
@@ -68,8 +72,9 @@ def plot_prompt_type(stats, plt):
             # Display the plot
             plt.ylim(top=11)
             plt.yticks(np.arange(12))
-            plt.savefig('out/questions/{}'.format("perPrompt"+key))
+            plt.savefig('out/questions/{}'.format("perPrompt"+key), dpi=300)
             plt.show()
+
     dict_complex[""] = np.full(12, np.NaN)
     dict_simple[""] = np.full(12, np.NaN)
     dict_simple = pd.DataFrame(dict_simple)
@@ -108,7 +113,7 @@ def plot_prompt_type(stats, plt):
     legend1 = fig.legend(handles, labels, borderpad=1, handlelength=2, handletextpad=2, labelspacing=1, bbox_to_anchor=(0.67, .893), title="Top: Simple Prompting\nBottom: Complex Prompting")
     plt.setp(legend1.get_title(), fontweight='bold')
     fig.gca().add_artist(legend1)
-    plt.savefig('out/questions/{}'.format("per_prompt_type"))
+    plt.savefig('out/questions/{}'.format("per_prompt_type"), dpi=300)
     plt.show()
 
 
@@ -129,8 +134,8 @@ def plot_task(stats, plt):
             width = 0.35  # the width of the bars
             # Creating the bar chart
             plt.figure(figsize=(7, 6))
-            plt.bar(x + width / 2, data_task1.values(), width, label="Challenge 1", color="C2")
-            plt.bar(x - width / 2, data_task2.values(), width, label="Challenge 2", color="C3")
+            plt.bar(x + width / 2, data_task1.values(), width, label="Challenge One", color="C2")
+            plt.bar(x - width / 2, data_task2.values(), width, label="Challenge Two", color="C3")
             # Adding titles and labels
             plt.title(stats["mapping"]["taskSpecific"][key], wrap=True)
             # plt.xlabel('User response')
@@ -141,7 +146,7 @@ def plot_task(stats, plt):
             # Display the plot
             plt.ylim(top=11)
             plt.yticks(np.arange(12))
-            plt.savefig('out/questions/{}'.format("perTask"+key))
+            plt.savefig('out/questions/{}'.format("perTask"+key), dpi=300)
             plt.show()
     dict_task2[""] = np.full(12, np.NaN)
     dict_task1[""] = np.full(12, np.NaN)
@@ -180,5 +185,5 @@ def plot_task(stats, plt):
     legend1 = fig.legend(handles, labels, borderpad=1, handlelength=2, handletextpad=2, labelspacing=1, bbox_to_anchor=(0.67, .893), title="Top: Challenge One\nBottom: Challenge Two")
     plt.setp(legend1.get_title(), fontweight='bold')
     fig.gca().add_artist(legend1)
-    plt.savefig('out/questions/{}'.format("per_task"))
+    plt.savefig('out/questions/{}'.format("per_task"), dpi=300)
     plt.show()

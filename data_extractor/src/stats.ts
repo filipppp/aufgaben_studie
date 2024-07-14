@@ -3,7 +3,7 @@ import {StudyQuestions, TaskQuestions} from "./question-mapping";
 import {studyPath} from "./config";
 import DiffMatchPatch from "diff-match-patch";
 
-export const getTimingsPerPromptType = (promptType: "simple" | "complex", key: keyof Pick<TaskQuestions, "supervisorInitial" | "supervisorRefine">, mustBeFinished: boolean = false) => {
+export const getTimingsPerPromptType = (promptType: "simple" | "complex", key: keyof Pick<TaskQuestions, "supervisorInitial" | "supervisorRefine">, mustBeFinished: boolean = false, both = false) => {
     const timings: number[] = [];
     participants.forEach(p => {
         if (promptType === "simple") {
@@ -35,7 +35,7 @@ export const getTimingsPerTask = (task: 1 | 2, key: keyof Pick<TaskQuestions, "s
 export const getTimings = (key: keyof Pick<StudyQuestions["pre"], "age" | "csFieldYears" | "csWorkYears">) => {
     const timings: number[] = [];
     participants.forEach(p => {
-            timings.push(p.studyQuestions.pre[key])
+        timings.push(p.studyQuestions.pre[key])
     });
     return timings;
 }
@@ -85,7 +85,6 @@ export const calculateAveragePerPromptType = (key: keyof ParticipantFiles, promp
     }, 0) / participants.length;
 
 
-
 export const getCount = (cb: (p: ParticipantInfo) => string | number, counts?: Record<string, number>) => {
     if (!counts) counts = {};
     participants.forEach(participant => {
@@ -125,8 +124,8 @@ export const getCountPerPromptType = (promptType: "simple" | "complex",
 }
 
 export const getCountPerTask = (task: 1 | 2,
-                                      key: keyof TaskQuestions,
-                                      counts?: Record<string, number>) => {
+                                key: keyof TaskQuestions,
+                                counts?: Record<string, number>) => {
     if (!counts) {
         counts = {};
     } else {
@@ -139,26 +138,54 @@ export const getCountPerTask = (task: 1 | 2,
     return counts;
 }
 
-export function getLengthPerPromptType(key: keyof ParticipantFiles, promptType: "simple" | "complex") {
+export function getLengthPerPromptType(key: keyof ParticipantFiles, promptType: "simple" | "complex", lines = false) {
     return participants.map(p => {
+        let str: string;
         if (promptType === "simple") {
             if (p.studyQuestions.pre.variant === "Variation 1") {
-                return p.task1[key].length;
+                str = p.task1[key];
             } else {
-                return p.task2[key].length;
+                str = p.task2[key];
             }
         } else {
             if (p.studyQuestions.pre.variant === "Variation 1") {
-                return p.task2[key].length;
+                str = p.task2[key];
             } else {
-                return p.task1[key].length;
+                str = p.task1[key];
             }
         }
+        if (lines) {
+            console.log(participants)
+        }
+        return lines ? str.split("\n").length : str.length;
     }, 0);
 }
 
+export function getLengthPerPromptTypeForParticipant(participant: ParticipantInfo, key: keyof ParticipantFiles, promptType: "simple" | "complex", lines = false) {
+    let str: string;
+    if (promptType === "simple") {
+        if (participant.studyQuestions.pre.variant === "Variation 1") {
+            str = participant.task1[key];
+        } else {
+            str = participant.task2[key];
+        }
+    } else {
+        if (participant.studyQuestions.pre.variant === "Variation 1") {
+            str = participant.task2[key];
+        } else {
+            str = participant.task1[key];
+        }
+    }
+    return lines ? str.split("\n").length : str.length;
+}
+
+
 export const getLinesChangedPerTask = (task: 1 | 2, outputType: "deleted" | "changed" | "added") => {
     return participants.map(p => getDiff(p[`task${task}`].gptCode, p[`task${task}`].userCode)[outputType]);
+}
+
+export const getLinesChangedPerTaskPerParticipant = (p: ParticipantInfo, task: 1 | 2, outputType: "deleted" | "changed" | "added") => {
+    return getDiff(p[`task${task}`].gptCode, p[`task${task}`].userCode)[outputType];
 }
 
 export const getLinesChangedPerPromptType = (promptType: "simple" | "complex", outputType: "deleted" | "changed" | "added") => {
@@ -178,6 +205,21 @@ export const getLinesChangedPerPromptType = (promptType: "simple" | "complex", o
         }
     });
 }
+export const getLinesChangedPerPromptTypePerParticipant = (participant: ParticipantInfo,promptType: "simple" | "complex", outputType: "deleted" | "changed" | "added") => {
+    if (promptType === "simple") {
+        if (participant.studyQuestions.pre.variant === "Variation 1") {
+            return getDiff(participant.task1.gptCode, participant.task1.userCode)[outputType];
+        } else {
+            return getDiff(participant.task2.gptCode, participant.task2.userCode)[outputType];
+        }
+    } else {
+        if (participant.studyQuestions.pre.variant === "Variation 1") {
+            return getDiff(participant.task1.gptCode, participant.task1.userCode)[outputType];
+        } else {
+            return getDiff(participant.task2.gptCode, participant.task2.userCode)[outputType];
+        }
+    }
+}
 
 function getDiff(gpt: string, user: string) {
     const dmp = new DiffMatchPatch();
@@ -196,7 +238,7 @@ function getDiff(gpt: string, user: string) {
                 return `+ ${text}`; // Addition
         }
     }).join('\n');
-    return {deleted, added, changed: deleted+added}
+    return {deleted, added, changed: deleted + added}
 }
 
 
@@ -214,6 +256,10 @@ export function getCsv() {
         row["Attitude towards AI"] = p.studyQuestions.pre.attitudeTowardsAI;
         row["LLM usage frequency"] = p.studyQuestions.pre.llmUsageFrequency;
         row["Future use of LLMs"] = p.studyQuestions.post.futureUseOfLLMs;
+
+        row["score/attitudeTowardsAI"] = getAgreementScore(p.studyQuestions.pre.attitudeTowardsAI);
+        row["score/llmUsageFrequency"] = getAgreementScore(p.studyQuestions.pre.llmUsageFrequency);
+        row["score/futureUseOfLLMs"] = getAgreementScore(p.studyQuestions.post.futureUseOfLLMs);
 
         let taskSimple: 'task1' | 'task2' = "task1";
         let taskComplex: 'task1' | 'task2' = "task2";
@@ -236,6 +282,13 @@ export function getCsv() {
         row[`simple/initialSolutionFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorInitial : null;
         row[`simple/refineFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorRefine : null;
         row[`simple/completeFinished (seconds)`] = p.studyQuestions[taskSimple].supervisorTaskComplete === "Yes" ? p.studyQuestions[taskSimple].supervisorRefine + p.studyQuestions[taskSimple].supervisorInitial : null;
+        row[`simple/refinePercentageFinished`] = row[`simple/refineFinished (seconds)`] / (row[`simple/refineFinished (seconds)`] + row[`simple/initialSolutionFinished (seconds)`]);
+        row[`simple/initialPercentageFinished`] = row[`simple/initialSolutionFinished (seconds)`] / (row[`simple/refineFinished (seconds)`] + row[`simple/initialSolutionFinished (seconds)`]);
+        row["simple/responseGPTLength"] = getLengthPerPromptTypeForParticipant(p, "responseGPT", "simple");
+        row["simple/promptLength"] = getLengthPerPromptTypeForParticipant(p, "promptUser", "simple");
+        row["simple/gptCodeLength"] = getLengthPerPromptTypeForParticipant(p, "gptCode", "simple", true);
+        row["simple/userCodeLength"] = getLengthPerPromptTypeForParticipant(p, "userCode", "simple", true);
+
         row[`complex/efficiency`] = getAgreementScore(p.studyQuestions[taskComplex].efficiency);
         row[`complex/productivity`] = getAgreementScore(p.studyQuestions[taskComplex].perceivedProductivity);
         row[`complex/promptingDaily`] = p.studyQuestions[taskComplex].promptingTechAverage;
@@ -251,6 +304,19 @@ export function getCsv() {
         row[`complex/initialSolution (seconds)`] = p.studyQuestions[taskComplex].supervisorInitial;
         row[`complex/refine(seconds)`] = p.studyQuestions[taskComplex].supervisorRefine;
         row[`complex/complete(seconds)`] = p.studyQuestions[taskComplex].supervisorRefine + p.studyQuestions[taskComplex].supervisorInitial;
+        row[`complex/refinePercentageFinished`] = row[`complex/refineFinished (seconds)`] / (row[`complex/refineFinished (seconds)`] + row[`complex/initialSolutionFinished (seconds)`])
+        row[`complex/initialPercentageFinished`] = row[`complex/initialSolutionFinished (seconds)`] / (row[`complex/refineFinished (seconds)`] + row[`complex/initialSolutionFinished (seconds)`]);
+        row["complex/responseGPTLength"] = getLengthPerPromptTypeForParticipant(p, "responseGPT", "complex");
+        row["complex/promptLength"] = getLengthPerPromptTypeForParticipant(p, "promptUser", "complex");
+        row["complex/gptCodeLength"] = getLengthPerPromptTypeForParticipant(p, "gptCode", "complex", true);
+        row["complex/userCodeLength"] = getLengthPerPromptTypeForParticipant(p, "userCode", "complex", true);
+
+        ["changed", "deleted", "added"].forEach((key: "deleted" | "changed" | "added") => {
+            row["task1/code" + capitalizeFirstLetter(key)] = getLinesChangedPerTaskPerParticipant(p,1, key);
+            row["task2/code" + capitalizeFirstLetter(key)] = getLinesChangedPerTaskPerParticipant(p,1, key);
+            row["simple/code" + capitalizeFirstLetter(key)] = getLinesChangedPerPromptTypePerParticipant(p,"simple", key);
+            row["complex/code" + capitalizeFirstLetter(key)] = getLinesChangedPerPromptTypePerParticipant(p,"complex", key);
+        });
 
 
         row[`task1/taskComplete`] = p.studyQuestions.task1.supervisorTaskComplete;
@@ -259,34 +325,57 @@ export function getCsv() {
         row[`task1/initialSolutionFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorInitial : null;
         row[`task1/refineFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorRefine : null;
         row[`task1/completeFinished (seconds)`] = p.studyQuestions.task1.supervisorTaskComplete === "Yes" ? p.studyQuestions.task1.supervisorRefine + p.studyQuestions.task1.supervisorInitial : null;
+        row[`task1/refinePercentageFinished`] = row[`task1/refineFinished (seconds)`] / (row[`task1/refineFinished (seconds)`] + row[`task1/initialSolutionFinished (seconds)`])
+        row[`task1/initialPercentageFinished`] = row[`task1/initialSolutionFinished (seconds)`] / (row[`task1/refineFinished (seconds)`] + row[`task1/initialSolutionFinished (seconds)`])
         row[`task2/taskComplete`] = p.studyQuestions.task2.supervisorTaskComplete;
         row[`task2/initialSolution (seconds)`] = p.studyQuestions.task2.supervisorInitial;
         row[`task2/refine (seconds)`] = p.studyQuestions.task2.supervisorRefine;
         row[`task2/initialSolutionFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorInitial : null;
         row[`task2/refineFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorRefine : null;
         row[`task2/completeFinished (seconds)`] = p.studyQuestions.task2.supervisorTaskComplete === "Yes" ? p.studyQuestions.task2.supervisorRefine + p.studyQuestions.task2.supervisorInitial : null;
+        row[`task2/refinePercentageFinished`] = row[`task2/refineFinished (seconds)`] / (row[`task2/refineFinished (seconds)`] + row[`task2/initialSolutionFinished (seconds)`])
+        row[`task2/initialPercentageFinished`] = row[`task2/initialSolutionFinished (seconds)`] / (row[`task2/refineFinished (seconds)`] + row[`task2/initialSolutionFinished (seconds)`]);
+
         return row;
     })
+}
+
+function capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function getScoreFor(p: ParticipantInfo, need: "autonomy" | "security" | "meaning" | "competence" | "stimulation", task: "task1" | "task2") {
     let score = 0;
     Object.keys(p.studyQuestions[task]).filter(k => k.startsWith(need))
         .forEach((k: keyof TaskQuestions) => score += getAgreementScore(p.studyQuestions[task][k] as string));
-    return Math.round((score / 3)*1000)/1000
+    return Math.round((score / 3) * 1000) / 1000
 }
 
 function getAgreementScore(val: string) {
     switch (val) {
+        case "Never":
+        case "Definitely no":
+        case "Highly unfavorable":
         case "Strongly disagree":
             return 1;
+        case "Somewhat unfavorable":
+        case "Probably no":
+        case "Rarely":
         case "Disagree":
             return 2;
+        case "Regularly":
         case "Neutral":
             return 3;
+        case "Somewhat favorable":
+        case "Probably yes":
+        case "Often":
         case "Agree":
             return 4;
+        case "Highly favorable":
+        case "Definitely yes":
+        case "Almost always":
         case "Strongly agree":
             return 5;
     }
 }
+

@@ -22,7 +22,7 @@ def boxplot(plt, datapoints, labels, title, ylabel, colors=None):
     plt.xticks(positions, labels)
     plt.title(title)
     plt.ylabel(ylabel)
-    plt.savefig('out/needs/{}'.format(title))
+    plt.savefig('out/needs/{}'.format(title), dpi=300)
     plt.show()
 
 def plot_needs(stats, plt):
